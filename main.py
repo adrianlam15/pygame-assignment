@@ -10,13 +10,13 @@ class Game:
 
     # constructor for game class
     def __init__(self):
-        self.SCREEN_WIDTH, self.SCREEN_WIDTH = (
+        self.SCREEN_WIDTH, self.SCREEN_HEIGHT = (
             1280,
             720,
         )  # screen width and screen height
         self.running = True  # game state
         self.SCREEN = pygame.display.set_mode(
-            (self.SCREEN_WIDTH, self.SCREEN_WIDTH)
+            (self.SCREEN_WIDTH, self.SCREEN_HEIGHT)
         )  # initialize window
         self.CAPTION = pygame.display.set_caption(
             "Hello There!"
@@ -51,7 +51,9 @@ class Game:
     # load asset function of game
     def load_assets(self):
         self.asset_dir = os.path.join("assets")
-        self.missile = Missile(self, 200, 0, 4)  # missile arguments (game, x, y, speed)
+        self.missile = Missile(
+            self, 1280, 0, 3
+        )  # missile arguments (game, x, y, speed)
         self.barrier = Barrier(self, 350, 50)  # barrier arguments (game, x, y)
 
     # render function of game
