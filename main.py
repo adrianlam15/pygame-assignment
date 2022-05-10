@@ -28,6 +28,9 @@ class Game:
             0,
             0,
         )  # delta time, current time, and previous time aspect // for framerate independence
+        self.missile_group = pygame.sprite.Group()
+        self.barrier_group = pygame.sprite.Group()
+        self.asset_dir = os.path.join("assets")
 
     # main loop funtion of game
     def main_loop(self):
@@ -50,11 +53,12 @@ class Game:
 
     # load asset function of game
     def load_assets(self):
-        self.asset_dir = os.path.join("assets")
         self.missile = Missile(
             self, 1280, 0, 3
         )  # missile arguments (game, x, y, speed)
+        self.missile_group.add(self.missile)
         self.barrier = Barrier(self, 350, 50)  # barrier arguments (game, x, y)
+        self.barrier_group.add(self.barrier)
 
     # render function of game
     def render(self):
