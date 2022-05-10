@@ -2,7 +2,6 @@
 import pygame, time, os, random
 from barrier import Barrier
 from missile import Missile
-from mouse import Mouse
 
 # game class
 class Game:
@@ -122,14 +121,11 @@ class Game:
             if (
                 event.type == pygame.MOUSEBUTTONDOWN
             ):  # detect when event.type == pygame.MOUSEBUTTON
-                self.mouse_pos = (
-                    Mouse()
-                )  # call custom Mouse() class which returns x, y of mouse
                 for (
                     self.missile
                 ) in self.missile_group:  # checking which missile what clicked
                     if self.missile.rect.collidepoint(
-                        self.mouse_pos.x, self.mouse_pos.y
+                        pygame.mouse.get_pos()
                     ):  # checking for collision
                         self.missile.kill()  # removing missile from group and removing it's instanced
 
