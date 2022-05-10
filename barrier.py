@@ -36,7 +36,6 @@ class Barrier(pygame.sprite.Sprite):  # inherit attrs from pygame Sprite class
             self.images.append(
                 pygame.image.load(os.path.join(self.game.asset_dir, f"barrier{N}.png"))
             )
-
         self.surface = pygame.Surface(
             (self.images[0].get_width(), self.images[0].get_height())
         )  # make surface with image attributes
