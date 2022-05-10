@@ -10,7 +10,7 @@ class Game:
 
     # constructor for game class
     def __init__(self):
-        self.MAIN_SCREEN_WIDTH, self.MAIN_SCREEN_HEIGHT = (
+        self.SCREEN_WIDTH, self.SCREEN_HEIGHT = (
             1280,
             720,
         )  # screen width and screen height
@@ -26,7 +26,7 @@ class Game:
         self.missile_group = pygame.sprite.Group()  # set missile group var
         self.barrier_group = pygame.sprite.Group()  # set barrier group car
 
-    # level function of game // input validation for future
+    # level function of game
     def levels(self):
         self.level_choice = input(
             "Levels: | Normal | Hard | Impossible\nChoice: "
@@ -66,13 +66,15 @@ class Game:
 
     # initalize SCREEN of program
     def SCREEN(self):
-        self.MAIN_SCREEN = pygame.display.set_mode(
-            (self.MAIN_SCREEN_WIDTH, self.MAIN_SCREEN_HEIGHT)
+        self.SCREEN = pygame.display.set_mode(
+            (self.SCREEN_WIDTH, self.SCREEN_HEIGHT)
         )  # initialize window
         self.CAPTION = pygame.display.set_caption(
             "Mr. Garvin's Nuclear Madness"
         )  # set caption of window
-        self.icon = pygame.display.set_icon(pygame.image.load("missile.png"))
+        self.icon = pygame.display.set_icon(
+            pygame.image.load("missile.png")
+        )  # set icon of window
 
     # Experimental restart function // for future
     """# main loop function of game
@@ -140,7 +142,7 @@ class Game:
     # load barrier function of game
     def load_barrier(self):
         for y in range(
-            0, self.MAIN_SCREEN_HEIGHT, 128
+            0, self.SCREEN_HEIGHT, 128
         ):  # load barried according to screen height
             self.barrier = Barrier(self, 150, y)
             self.barrier_group.add(
@@ -149,6 +151,7 @@ class Game:
 
     # missile logic function of game // creates an instance of missile object
     def missile_logic(self):
+        print("normal")
         self.missile = Missile(self, 3)
         # missile speed changed for "hard" mode
         if self.level_choice.lower() == "hard":
@@ -158,8 +161,6 @@ class Game:
             for num in range(10):  # spam missiles
                 self.missile = Missile(self, random.randint(23, 30))
                 self.missile_group.add(self.missile)
-        else:
-            self.missile_group.add(self.missile)
 
     # collision detection function of game
     def collision_detection(self):
@@ -200,9 +201,9 @@ class Game:
 
     # render function of game
     def render(self):
-        self.MAIN_SCREEN.fill("White")  # makes main surface white
-        self.barrier_group.draw(self.MAIN_SCREEN)  # draws barrier group on main screen
-        self.missile_group.draw(self.MAIN_SCREEN)  # draws missile group on main screen
+        self.SCREEN.fill("White")  # makes main surface white
+        self.barrier_group.draw(self.SCREEN)  # draws barrier group on main screen
+        self.missile_group.draw(self.SCREEN)  # draws missile group on main screen
 
         # update methods
         self.missile_group.update()  # update missile group speed
