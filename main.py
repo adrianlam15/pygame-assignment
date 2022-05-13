@@ -27,7 +27,7 @@ class Game:
         self.score = 0
         self.missile_speed = 3
         self.level = 0
-        self.end_barrier = pygame.Surface((1, 1))
+        self.end_barrier = pygame.Rect(0, 0, 1, 1)
 
     # level function of game // input validation for future
     def levels(self):
@@ -165,13 +165,13 @@ class Game:
     # determine endgame function of game // if user has lost
     def determine_endgame(self):
         for self.missile in self.missile_group:
-            if pygame.sprite.spritecollideany(self.missile, self.end_barrier):
+            if pygame.sprite.collide_rect(self.end_barrier, self.missile):
                 self.playing = False  # update playing attribute of class
 
     # render function of game
     def render(self):
         self.MAIN_SCREEN.fill("White")  # makes main surface white
-        self.end_barrier.blit(self.MAIN_SCREEN, (0, 0))
+        self.MAIN_SCREEN.draw(self.end_barrier)
         self.barrier_group.draw(self.MAIN_SCREEN)  # draws barrier group on main screen
         self.missile_group.draw(self.MAIN_SCREEN)  # draws missile group on main screen
 
