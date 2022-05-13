@@ -34,6 +34,7 @@ class Game:
         self.start = True
         self.play_hover = False
         self.start_loop = True
+        self.start_state = Start(self)
 
     # level function of game // input validation for future
     def levels(self):
@@ -52,7 +53,6 @@ class Game:
 
     # main loop function of game // function calls
     def main_loop(self):
-        self.get_state()
         if self.start_loop:
             self.playing = False
             self.load_text()
@@ -186,22 +186,20 @@ class Game:
                     self.end_render,
                     (self.MAIN_SCREEN_WIDTH / 2, self.MAIN_SCREEN_HEIGHT / 2),
                 )
+
         elif self.start_loop is True:
-            self.state_stack[-1].render()
+            self.start_state.render()
         pygame.display.update()  # updating overall display of game
         self.clock.tick(self.FPS)
 
-    def load_states(self):
-        self.start_state = Start(self)
+    """def load_states(self):
 
     def get_state(self):
         if self.start:
             if len(self.state_stack) == 0:
                 self.state_stack.append(self.start_state)
-        """if self.playing is True:
-            if len(self.state_stack) == 1:
-                self.state_stack.append(self)
-                print("added self")"""
+            elif len(self.state_stack) > 0:
+                self.state_stack.append(self)"""
 
 
 # main program
@@ -212,7 +210,6 @@ if __name__ == "__main__":
     game.load_barrier()
     game.levels()
     game.SCREEN()
-    game.load_states()
 
     # main loop
     while game.running:
