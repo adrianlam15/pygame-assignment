@@ -24,36 +24,16 @@ class Game:
         )  # delta time, current time, and previous time aspect // for framerate independence
         self.missile_group = pygame.sprite.Group()  # set missile group var
         self.barrier_group = pygame.sprite.Group()  # set barrier group car
+        self.score = 0
+        self.missile_speed = 3
+        self.level = 0
+        self.end_barrier = pygame.Surface((1, 1))
 
     # level function of game // input validation for future
     def levels(self):
-        self.level_choice = input(
-            "Levels: | Normal | Hard | Impossible\nChoice: "
-        )  # level choices of game
-        while (
-            self.level_choice.lower() != "normal"
-            and self.level_choice.lower() != "hard"
-            and self.level_choice.lower() != "impossible"
-        ):  # input validation
-            self.level_choice = input(
-                "\nInvalid entry.\nLevels: | Normal | Hard | Impossible\nChoice: "
-            )
-        # if level choice is "normal"
-        if self.level_choice.lower() == "normal":
-            pygame.time.set_timer(
-                pygame.USEREVENT, 1000
-            )  # every 1000 ms, a custom event will happen
-        # if level choice is "hard"
-        elif self.level_choice.lower() == "hard":
-            pygame.time.set_timer(
-                pygame.USEREVENT, 1000
-            )  # every 1000 ms, a custom event will happen
-        # if level choice is "impossible"
-        elif self.level_choice.lower() == "impossible":
-            pygame.time.set_timer(
-                pygame.USEREVENT, 500
-            )  # every 500 ms, a custom event will happen
+        self.level_choice = "normal"
         self.playing = True
+        pygame.time.set_timer(pygame.USEREVENT, 1000)
 
     """# restart function // for future
     def restart_choice(self):
@@ -96,10 +76,11 @@ class Game:
             self.get_event()
             self.collision_detection()
             self.determine_endgame()
+            self.load_text()
             self.render()
         else:
             print("GAME OVER!")
-            exit()  # exit game
+            self.load_text()
 
     """# delta time function // for future
     def delta_time(self):
@@ -128,6 +109,7 @@ class Game:
                         pygame.mouse.get_pos()
                     ):  # checking for collision
                         self.missile.kill()  # removing missile from group and removing it's instanced
+                        self.score += 1
 
     # check asset function of game
     def check_assets(self):
@@ -145,17 +127,10 @@ class Game:
 
     # missile logic function of game // creates an instance of missile object
     def missile_logic(self):
-        self.missile = Missile(self, 3)
-        # missile speed changed for "hard" mode
-        if self.level_choice.lower() == "hard":
-            self.missile = Missile(self, random.randint(7, 13))
-        # missile speed changed for "impossible" mode
-        if self.level_choice.lower() == "impossible":
-            for num in range(10):  # spam missiles
-                self.missile = Missile(self, random.randint(23, 30))
-                self.missile_group.add(self.missile)
-        else:
-            self.missile_group.add(self.missile)
+        self.missile = Missile(self, self.missile_speed)
+        self.level = self.score // 5
+        self.missile_speed += self.level
+        self.missile_group.add(self.missile)
 
     # collision detection function of game
     def collision_detection(self):
@@ -170,7 +145,7 @@ class Game:
                     ):  # removes missile after collision with barrier // if program detects collision between missile group and barrier group
                         self.barrier.damage += 1  # set barrier damage value
                         self.barrier.update()  # update barrier image
-        # collision detection for "hard" mode
+        """# collision detection for "hard" mode
         elif self.level_choice.lower() == "hard":  # collision detection for "hard" mode
             for self.barrier in self.barrier_group:
                 if pygame.sprite.spritecollideany(
@@ -185,26 +160,45 @@ class Game:
                     self.barrier, self.missile_group
                 ):  # if program detects collision between barrier and missile group
                     self.barrier.damage += 1  # set barrier damage value
-                    self.barrier.update()  # update barrier image // not necessarily needed but the animation is pleasing
+                    self.barrier.update()  # update barrier image // not necessarily needed but the animation is pleasing"""
 
     # determine endgame function of game // if user has lost
     def determine_endgame(self):
-        if (
-            len(self.barrier_group) == 0
-        ):  # user has lost when barrier group is empty // no barrier remaining
-            self.playing = False  # update playing attribute of class
+        for self.missile in self.missile_group:
+            if pygame.sprite.spritecollideany(self.missile, self.end_barrier):
+                self.playing = False  # update playing attribute of class
 
     # render function of game
     def render(self):
         self.MAIN_SCREEN.fill("White")  # makes main surface white
+        self.end_barrier.blit(self.MAIN_SCREEN, (0, 0))
         self.barrier_group.draw(self.MAIN_SCREEN)  # draws barrier group on main screen
         self.missile_group.draw(self.MAIN_SCREEN)  # draws missile group on main screen
 
         # update methods
         self.missile_group.update()  # update missile group speed
         self.barrier_group.update()  # update barrier group state
+
+        # drawing text
+        self.MAIN_SCREEN.blit(self.score_render, (0, 0))
+        self.MAIN_SCREEN.blit(self.speed_render, (self.MAIN_SCREEN_WIDTH / 2, 0))
         pygame.display.update()  # updating overall display of game
         self.clock.tick(self.FPS)
+
+    def load_text(self):
+        if self.playing:
+            self.score_load = pygame.font.Font("Grobold.ttf", 30)
+            self.score_render = self.score_load.render(
+                f"Score: {self.score}", True, "Black"
+            )
+
+            self.speed = pygame.font.Font("Grobold.ttf", 30)
+            self.speed_render = self.speed.render(
+                f"Speed: {self.missile_speed}", True, "Black"
+            )
+        if not self.playing:
+            self.end = pygame.font.Font("Grobold.ttf", 60)
+            self.end_render = self.end.render("Game Over!", True, "Black`")
 
 
 # main program
