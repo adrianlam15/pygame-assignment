@@ -2,6 +2,8 @@
 import pygame, time, os, random
 from barrier import Barrier
 from missile import Missile
+from states import Start
+
 
 # game class
 class Game:
@@ -27,21 +29,16 @@ class Game:
         self.score = 0
         self.missile_speed = 3
         self.level = 0
-        self.end_barrier = pygame.Rect(0, 0, 1, 1)
+        self.prev_level = 0
+        self.state_stack = []
+        self.start = True
+        self.play_hover = False
+        self.start_loop = True
 
     # level function of game // input validation for future
     def levels(self):
-        self.level_choice = "normal"
         self.playing = True
         pygame.time.set_timer(pygame.USEREVENT, 1000)
-
-    """# restart function // for future
-    def restart_choice(self):
-        restart_choice = input("Restart game? (y/n):\n")
-        if restart_choice.lower() == "y":
-            self.playing = True
-        else:
-            exit()"""
 
     # initalize SCREEN of program
     def SCREEN(self):
@@ -53,34 +50,25 @@ class Game:
         )  # set caption of window
         self.icon = pygame.display.set_icon(pygame.image.load("missile.png"))
 
-    # Experimental restart function // for future
-    """# main loop function of game
-    def main_loop(self):
-        while self.running:
-            self.levels()
-            self.SCREEN()
-            self.load_barrier()
-            while self.playing:
-                if self.playing is True:
-                    self.get_event()
-                    self.spawn_rate_missile()
-                    self.collision_detection()
-                    self.determine_endgame()
-                    self.render()
-
-            while self.playing is False:
-                self.restart_choice()"""
     # main loop function of game // function calls
     def main_loop(self):
+        self.get_state()
+        if self.start_loop:
+            self.playing = False
+            self.load_text()
+
+            self.get_event()
+            self.render()
+
         if self.playing:
             self.get_event()
             self.collision_detection()
             self.determine_endgame()
             self.load_text()
+
             self.render()
         else:
-            print("GAME OVER!")
-            self.load_text()
+            self.get_event()
 
     """# delta time function // for future
     def delta_time(self):
@@ -95,21 +83,30 @@ class Game:
         for event in self.event:
             if event.type == pygame.QUIT:  # quit program / game
                 pygame.quit()
-            if (
-                event.type == pygame.USEREVENT
-            ):  # call missile_logic() function when event.type == pygame.USEREVENT
-                self.missile_logic()
-            if (
-                event.type == pygame.MOUSEBUTTONDOWN
-            ):  # detect when event.type == pygame.MOUSEBUTTON
-                for (
-                    self.missile
-                ) in self.missile_group:  # checking which missile what clicked
-                    if self.missile.rect.collidepoint(
-                        pygame.mouse.get_pos()
-                    ):  # checking for collision
-                        self.missile.kill()  # removing missile from group and removing it's instanced
-                        self.score += 1
+            if self.playing is True:
+                if (
+                    event.type == pygame.USEREVENT
+                ):  # call missile_logic() function when event.type == pygame.USEREVENT
+                    self.missile_logic()
+                if (
+                    event.type == pygame.MOUSEBUTTONDOWN
+                ):  # detect when event.type == pygame.MOUSEBUTTON
+                    for (
+                        self.missile
+                    ) in self.missile_group:  # checking which missile what clicked
+                        if self.missile.rect.collidepoint(
+                            pygame.mouse.get_pos()
+                        ):  # checking for collision
+                            self.missile.kill()  # removing missile from group and removing it's instanced
+                            self.score += 1
+            if self.start_loop is True:
+                mouse_pos = pygame.mouse.get_pos()
+                if self.start_state.hover_rect.collidepoint(mouse_pos):
+                    self.play_hover = True
+                    if event.type == pygame.MOUSEBUTTONDOWN:
+                        self.start_state.click = True
+                else:
+                    self.play_hover = False
 
     # check asset function of game
     def check_assets(self):
@@ -129,61 +126,28 @@ class Game:
     def missile_logic(self):
         self.missile = Missile(self, self.missile_speed)
         self.level = self.score // 5
-        self.missile_speed += self.level
+        if self.prev_level < self.level:
+            self.missile_speed += self.level
+            self.prev_level = self.level
         self.missile_group.add(self.missile)
 
     # collision detection function of game
     def collision_detection(self):
-        # collision detection for "normal" mode
-        if self.level_choice.lower() == "normal":
-            for self.barrier in self.barrier_group:
-                if pygame.sprite.spritecollideany(
-                    self.barrier, self.missile_group
-                ):  # if program detects collision between barrier and missile group
-                    if pygame.sprite.groupcollide(
-                        self.missile_group, self.barrier_group, True, False
-                    ):  # removes missile after collision with barrier // if program detects collision between missile group and barrier group
-                        self.barrier.damage += 1  # set barrier damage value
-                        self.barrier.update()  # update barrier image
-        """# collision detection for "hard" mode
-        elif self.level_choice.lower() == "hard":  # collision detection for "hard" mode
-            for self.barrier in self.barrier_group:
-                if pygame.sprite.spritecollideany(
-                    self.barrier, self.missile_group
-                ):  # if program detects collision between barrier and missile group
+        for self.barrier in self.barrier_group:
+            if pygame.sprite.spritecollideany(
+                self.barrier, self.missile_group
+            ):  # if program detects collision between barrier and missile group
+                if pygame.sprite.groupcollide(
+                    self.missile_group, self.barrier_group, True, False
+                ):  # removes missile after collision with barrier // if program detects collision between missile group and barrier group
                     self.barrier.damage += 1  # set barrier damage value
-                    self.barrier.update()  # update barrier image // not necessarily needed but the animation is pleasing
-        # collision detection for "impossible" mode
-        else:
-            for self.barrier in self.barrier_group:
-                if pygame.sprite.spritecollideany(
-                    self.barrier, self.missile_group
-                ):  # if program detects collision between barrier and missile group
-                    self.barrier.damage += 1  # set barrier damage value
-                    self.barrier.update()  # update barrier image // not necessarily needed but the animation is pleasing"""
+                    self.barrier.update()  # update barrier image
 
     # determine endgame function of game // if user has lost
     def determine_endgame(self):
         for self.missile in self.missile_group:
-            if pygame.sprite.collide_rect(self.end_barrier, self.missile):
-                self.playing = False  # update playing attribute of class
-
-    # render function of game
-    def render(self):
-        self.MAIN_SCREEN.fill("White")  # makes main surface white
-        self.MAIN_SCREEN.draw(self.end_barrier)
-        self.barrier_group.draw(self.MAIN_SCREEN)  # draws barrier group on main screen
-        self.missile_group.draw(self.MAIN_SCREEN)  # draws missile group on main screen
-
-        # update methods
-        self.missile_group.update()  # update missile group speed
-        self.barrier_group.update()  # update barrier group state
-
-        # drawing text
-        self.MAIN_SCREEN.blit(self.score_render, (0, 0))
-        self.MAIN_SCREEN.blit(self.speed_render, (self.MAIN_SCREEN_WIDTH / 2, 0))
-        pygame.display.update()  # updating overall display of game
-        self.clock.tick(self.FPS)
+            if self.missile.rect.centerx <= 0:
+                self.playing = False
 
     def load_text(self):
         if self.playing:
@@ -192,13 +156,52 @@ class Game:
                 f"Score: {self.score}", True, "Black"
             )
 
-            self.speed = pygame.font.Font("Grobold.ttf", 30)
-            self.speed_render = self.speed.render(
-                f"Speed: {self.missile_speed}", True, "Black"
+            self.level_font = pygame.font.Font("Grobold.ttf", 30)
+            self.level_render = self.level_font.render(
+                f"Level: {self.level}", True, "Black"
             )
-        if not self.playing:
+        if self.playing is False:
             self.end = pygame.font.Font("Grobold.ttf", 60)
-            self.end_render = self.end.render("Game Over!", True, "Black`")
+            self.end_render = self.end.render("Game Over!", True, "Black")
+
+    # render function of game
+    def render(self):
+        if self.playing is True:
+            self.MAIN_SCREEN.fill("White")  # makes main surface white
+            self.barrier_group.draw(
+                self.MAIN_SCREEN
+            )  # draws barrier group on main screen
+            self.missile_group.draw(
+                self.MAIN_SCREEN
+            )  # draws missile group on main screen
+
+            # update methods
+            self.missile_group.update()  # update missile group speed
+            self.barrier_group.update()  # update barrier group state
+            # drawing text
+            self.MAIN_SCREEN.blit(self.score_render, (0, 0))
+            self.MAIN_SCREEN.blit(self.level_render, (self.MAIN_SCREEN_WIDTH / 2, 0))
+            if self.playing is False:
+                self.MAIN_SCREEN.blit(
+                    self.end_render,
+                    (self.MAIN_SCREEN_WIDTH / 2, self.MAIN_SCREEN_HEIGHT / 2),
+                )
+        elif self.start_loop is True:
+            self.state_stack[-1].render()
+        pygame.display.update()  # updating overall display of game
+        self.clock.tick(self.FPS)
+
+    def load_states(self):
+        self.start_state = Start(self)
+
+    def get_state(self):
+        if self.start:
+            if len(self.state_stack) == 0:
+                self.state_stack.append(self.start_state)
+        """if self.playing is True:
+            if len(self.state_stack) == 1:
+                self.state_stack.append(self)
+                print("added self")"""
 
 
 # main program
@@ -209,6 +212,8 @@ if __name__ == "__main__":
     game.load_barrier()
     game.levels()
     game.SCREEN()
+    game.load_states()
+
     # main loop
     while game.running:
         game.main_loop()
