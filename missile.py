@@ -1,5 +1,5 @@
 # Lam, Adrian (705929)
-# ICS4U: Pygame Sprites (Part 1) - Missile Class
+# ICS4U: Pygame Sprites - Missile Class
 # 2022-05-09
 #
 # Program contains required libraries and modules to define the barrier class for main game
