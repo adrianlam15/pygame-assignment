@@ -39,7 +39,7 @@ class Missile(pygame.sprite.Sprite):  # inherit attrs from pygame Sprite class
             topleft=(self.x, self.y)
         )  # get rect coords of surface
         pygame.mixer.init()  # initialize music in pygame
-        self.sound = pygame.mixer.Sound("launch.ogg").play()
+        """self.sound= pygame.mixer.Sound("launch.ogg").play()  # play music"""
 
     # update function for speed
     def update(self):

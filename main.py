@@ -49,7 +49,7 @@ class Game:
         self.end_state = End(self)
         self.missile_group = pygame.sprite.Group()  # set missile group var
         self.barrier_group = pygame.sprite.Group()  # set barrier group car
-        self.music = pygame.mixer.Sound("music.ogg").play()
+        """self.music = pygame.mixer.Sound("music.ogg").play()"""
 
     # level function of game // input validation for future
     def levels(self):
