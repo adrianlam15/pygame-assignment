@@ -51,7 +51,7 @@ class Barrier(pygame.sprite.Sprite):  # inherit attrs from pygame Sprite class
                 (self.images[1].get_width(), self.images[1].get_height())
             )
             self.surface.blit(self.images[1], (0, 0))
-            """self.sound = pygame.mixer.Sound("hit.ogg").play()  # play sound"""
+            self.sound = pygame.mixer.Sound("hit.ogg").play()  # play sound
             self.image = self.images[1]
             self.damage = 1
         elif self.damage == 2:
