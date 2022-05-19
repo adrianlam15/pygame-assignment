@@ -1,5 +1,5 @@
 # Lam, Adrian (705929)
-# ICS4U: Pygame Sprites - Missile Class
+# ICS4U: Pygame Sprites - States
 # 2022-05-14
 #
 # Program contains required librarier and modules to define Start and End
@@ -96,7 +96,7 @@ class Start(pygame.sprite.Sprite):  # inherit attrs from pygame Sprite class
 # class End
 class End(pygame.sprite.Sprite):  # inherit attrs from pygame Sprite class
     def __init__(self, game):
-        self.sound = pygame.mixer.Sound("end_game_sound.ogg").play()
+        """self.sound = pygame.mixer.Sound("end_game_sound.ogg").play()"""
         self.game = game
         self.respawn = Button(
             self.game, 325, 372, 650, 61

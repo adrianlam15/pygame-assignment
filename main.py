@@ -1,8 +1,8 @@
 # Lam, Adrian (705929)
-# ICS4U: Pygame Sprites - Missile Class
+# ICS4U: Pygame Sprites - Main Game Class
 # 2022-05-14
 #
-# Program contains the required librarier and modules as well as the main Game
+# Program contains the required libraries and modules as well as the main Game
 # object/class required to run the game. Multiple objects/classes were called
 # from other files in order to organize code and formatting.
 
@@ -49,7 +49,7 @@ class Game:
         self.end_state = End(self)
         self.missile_group = pygame.sprite.Group()  # set missile group var
         self.barrier_group = pygame.sprite.Group()  # set barrier group car
-        self.music = pygame.mixer.Sound("music.ogg").play()
+        """self.music = pygame.mixer.Sound("music.ogg").play()"""
 
     # level function of game // input validation for future
     def levels(self):
@@ -157,6 +157,7 @@ class Game:
                         self.end_state.actions[
                             "Quit"
                         ] = True  # returns a 'True' boolean value to class attr
+                        exit()
 
     # check asset function of game
     def check_assets(self):
